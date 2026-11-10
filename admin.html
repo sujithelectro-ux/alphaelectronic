@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin panel — Alpha Electronic</title>
+<meta name="description" content="Alpha Electronic admin control panel for invoices, customers, prices and service requests.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#08111f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308111f'/%3E%3Ctext x='30' y='46' font-family='Georgia' font-size='38' font-style='italic' text-anchor='middle' fill='%23f3b23f'%3EA%3C/text%3E%3Ccircle cx='49' cy='17' r='5' fill='%23d62828'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dash-body dash-locked">
+
+<div class="dash-shell">
+  <aside class="dash-side" id="dashSide" aria-label="Admin navigation">
+    <a class="dash-brand" href="index.html" aria-label="Alpha Electronic home">
+      <span class="brand-mark">A</span>
+      <span class="brand-text">
+        <strong>Alpha Electronic</strong>
+        <span>Admin control</span>
+      </span>
+    </a>
+
+    <nav class="dash-nav">
+      <span class="dash-nav-label">Control panel</span>
+      <button class="dash-link active" type="button" data-tab="overview" data-title="Overview" data-sub="Business snapshot, invoices and customer activity">
+        <span class="li-ico" data-icon="grid"></span> Overview
+      </button>
+      <button class="dash-link" type="button" data-tab="invoices" data-title="Invoices" data-sub="Manage, share and assign customer invoices">
+        <span class="li-ico" data-icon="file"></span> Invoices
+      </button>
+      <button class="dash-link" type="button" data-tab="customers" data-title="Customers" data-sub="Registered portal accounts">
+        <span class="li-ico" data-icon="users"></span> Customers
+      </button>
+      <button class="dash-link" type="button" data-tab="admins" data-title="Administrators" data-sub="Owner email and admin access by UID">
+        <span class="li-ico" data-icon="shield"></span> Admins
+      </button>
+      <button class="dash-link" type="button" data-tab="requests" data-title="Messages" data-sub="Website, chatbot and portal enquiries">
+        <span class="li-ico" data-icon="inbox"></span> Messages
+        <span class="nav-badge" id="navReqBadge" hidden>0</span>
+      </button>
+      <button class="dash-link" type="button" data-tab="prices" data-title="Price manager" data-sub="Prices shared with the invoice maker">
+        <span class="li-ico" data-icon="tag"></span> Prices
+      </button>
+      <button class="dash-link" type="button" data-tab="setup" data-title="Firebase setup" data-sub="Admin access, rules and cloud controls">
+        <span class="li-ico" data-icon="gear"></span> Setup
+      </button>
+
+      <span class="dash-nav-label">Shortcuts</span>
+      <a class="dash-link" href="invoice.html">
+        <span class="li-ico" data-icon="plus"></span> Invoice maker
+      </a>
+      <a class="dash-link" href="index.html">
+        <span class="li-ico" data-icon="home"></span> Main website
+      </a>
+      <a class="dash-link" href="portal.html">
+        <span class="li-ico" data-icon="user"></span> Customer portal
+      </a>
+    </nav>
+
+    <div class="dash-side-foot">
+      <div class="dash-user">
+        <span class="du-avatar" id="userAvatar">A</span>
+        <span class="du-meta">
+          <strong id="userName">Administrator</strong>
+          <span id="userMail">—</span>
+        </span>
+      </div>
+      <button class="dash-signout" id="btnSignOut" type="button">Sign out</button>
+      <p class="dash-side-note">Admin control panel<br><a href="FIREBASE-SETUP.md">Firebase guide</a></p>
+    </div>
+  </aside>
+
+  <div class="dash-scrim" id="dashScrim"></div>
+
+  <div class="dash-main">
+    <header class="dash-top">
+      <button class="dash-menu" id="dashMenu" type="button" aria-label="Open menu">
+        <span data-icon="menu"></span>
+      </button>
+      <div class="dash-title">
+        <h1 id="pageTitle">Overview</h1>
+        <p id="pageSub">Business snapshot, invoices and customer activity</p>
+      </div>
+      <div class="dash-top-actions">
+        <a class="btn btn-outline btn-sm hide-sm" href="index.html">Website</a>
+        <a class="btn btn-gold btn-sm" href="invoice.html">
+          <span data-icon="plus" style="width:14px;height:14px;display:inline-flex"></span> New invoice
+        </a>
+      </div>
+    </header>
+
+    <main class="dash-content">
+      <div class="dash-alert" id="dashAlert" role="status"></div>
+
+      <!-- Overview -->
+      <section class="dash-view active" data-view="overview">
+        <div class="stat-grid" id="adminStats"></div>
+
+        <div class="dash-grid two section-gap">
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Recent invoices</h2>
+                <p class="dc-sub">Latest documents saved in the cloud</p>
+              </div>
+              <button class="mini-act" type="button" data-goto="invoices">Open invoices</button>
+            </div>
+            <div class="dc-body flush">
+              <div class="table-wrap">
+                <table class="dash-table" aria-label="Recent invoices">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Invoice</th>
+                      <th>Customer</th>
+                      <th class="right">Total</th>
+                      <th class="right">Balance</th>
+                      <th>Status</th>
+                      <th>Portal access</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminRecentBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-stack">
+            <div class="dash-card">
+              <div class="dc-head">
+                <div>
+                  <h2>Quick actions</h2>
+                  <p class="dc-sub">Everything from one place</p>
+                </div>
+              </div>
+              <div class="dc-body">
+                <div class="quick-list">
+                  <a class="quick-item" href="invoice.html">
+                    <span class="quick-ico" data-icon="plus"></span>
+                    <span><strong>Create an invoice</strong><span>Auto-saves to Firebase</span></span>
+                    <span class="qa-arrow">→</span>
+                  </a>
+                  <button class="quick-item" type="button" data-sync-local>
+                    <span class="quick-ico" data-icon="refresh"></span>
+                    <span><strong>Sync device invoices</strong><span>Upload local history to the cloud</span></span>
+                    <span class="qa-arrow">→</span>
+                  </button>
+                  <button class="quick-item" type="button" data-goto="prices">
+                    <span class="quick-ico" data-icon="tag"></span>
+                    <span><strong>Manage prices</strong><span>Update the shared item catalogue</span></span>
+                    <span class="qa-arrow">→</span>
+                  </button>
+                  <button class="quick-item" type="button" data-goto="admins">
+                    <span class="quick-ico" data-icon="shield"></span>
+                    <span><strong>Manage admins</strong><span>Owner email and admin accounts</span></span>
+                    <span class="qa-arrow">→</span>
+                  </button>
+                  <button class="quick-item" type="button" data-goto="setup">
+                    <span class="quick-ico" data-icon="gear"></span>
+                    <span><strong>Firebase setup</strong><span>Rules, access check and exports</span></span>
+                    <span class="qa-arrow">→</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <div class="dc-head">
+                <div>
+                  <h2>Latest messages</h2>
+                  <p class="dc-sub">New enquiries from the website, chatbot and portal</p>
+                </div>
+                <button class="mini-act" type="button" data-goto="requests">View all</button>
+              </div>
+              <div class="dc-body">
+                <ul class="acct-list" id="adminRecentReq"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Invoices -->
+      <section class="dash-view" data-view="invoices">
+        <div class="dash-card">
+          <div class="dc-head">
+            <div>
+              <h2>All invoices</h2>
+              <p class="dc-sub">Open, share, assign to a customer or delete</p>
+            </div>
+          </div>
+          <div class="dash-toolbar">
+            <div class="dash-search">
+              <span data-icon="search"></span>
+              <input class="dash-input" id="invSearch" type="search" placeholder="Search invoice no, customer, phone…" autocomplete="off">
+            </div>
+            <select class="dash-select" id="invFilter" aria-label="Filter invoices by status">
+              <option value="all">All statuses</option>
+              <option value="due">Balance due</option>
+              <option value="paid">Paid</option>
+              <option value="quote">Quotations</option>
+            </select>
+            <button class="mini-act" type="button" id="btnInvExport">Export CSV</button>
+            <span class="toolbar-count" id="invCount">0 shown</span>
+          </div>
+          <div class="dc-body flush">
+            <div class="table-wrap">
+              <table class="dash-table" aria-label="All invoices">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Invoice</th>
+                    <th>Customer</th>
+                    <th class="right">Total</th>
+                    <th class="right">Balance</th>
+                    <th>Status</th>
+                    <th>Portal access</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminInvBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p class="dash-note">Share link opens the invoice in read-only mode with A4 print / PDF. Customers only see invoices assigned to their account.</p>
+      </section>
+
+      <!-- Customers -->
+      <section class="dash-view" data-view="customers">
+        <div class="dash-card">
+          <div class="dc-head">
+            <div>
+              <h2>Customer accounts <span class="badge muted" id="custCount">0</span></h2>
+              <p class="dc-sub">Customers register from the login page with the email you have on file</p>
+            </div>
+          </div>
+          <div class="dash-toolbar">
+            <div class="dash-search">
+              <span data-icon="search"></span>
+              <input class="dash-input" id="custSearch" type="search" placeholder="Search name, email or phone…" autocomplete="off">
+            </div>
+            <span class="toolbar-count" id="custShown">0 shown</span>
+          </div>
+          <div class="dc-body flush">
+            <div class="table-wrap">
+              <table class="dash-table" aria-label="Customers">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Invoices</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminCustBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p class="dash-note">Customers can create their own account at <a href="login.html?mode=register&amp;next=portal.html">login.html</a>. Admin can edit contact details, give admin access or delete a profile. Passwords are never visible.</p>
+      </section>
+
+      <!-- Admins -->
+      <section class="dash-view" data-view="admins">
+        <div class="setup-grid">
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Administrators <span class="badge muted" id="adminsCount">0</span></h2>
+                <p class="dc-sub">Accounts that can open this control panel</p>
+              </div>
+            </div>
+            <div class="dc-body flush">
+              <div class="table-wrap">
+                <table class="dash-table compact" aria-label="Administrators">
+                  <thead>
+                    <tr>
+                      <th>Admin account</th>
+                      <th>Access</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminAdminsBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Owner email</h2>
+                <p class="dc-sub">Saved to Firebase at config/adminEmail</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <form id="adminEmailForm" class="price-add" novalidate>
+                <div class="field" style="flex:1 1 220px">
+                  <label for="adminEmailInput">Admin email</label>
+                  <input class="dash-input" id="adminEmailInput" type="email" placeholder="owner@example.com" autocomplete="off">
+                </div>
+                <button class="btn btn-navy btn-sm" type="submit" id="adminEmailSave">Save email</button>
+              </form>
+              <p class="dash-note">This address signs in as administrator. Add your UID below before changing it, so you never lock yourself out.</p>
+            </div>
+          </div>
+
+          <div class="dash-card span-all">
+            <div class="dc-head">
+              <div>
+                <h2>Add administrator</h2>
+                <p class="dc-sub">Give another account full admin access</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <form id="adminAddForm" class="price-add" novalidate>
+                <div class="field" style="flex:1 1 260px">
+                  <label for="adminUidInput">Firebase user UID</label>
+                  <input class="dash-input" id="adminUidInput" type="text" placeholder="Paste the UID from Customers" autocomplete="off">
+                </div>
+                <button class="btn btn-navy btn-sm" type="submit" id="adminAddBtn">Add admin</button>
+              </form>
+              <p class="dash-note">The person must create an account first at <a href="login.html?mode=register&amp;next=admin.html">login.html</a>. Copy their UID from <strong>Customers</strong>, paste it here and save. Stored in Firebase at <code>admins/UID</code>.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Messages -->
+      <section class="dash-view" data-view="requests">
+        <div class="dash-card">
+          <div class="dc-head">
+            <div>
+              <h2>Messages &amp; service requests</h2>
+              <p class="dc-sub">Website forms, chatbot leads and portal enquiries — saved in Firebase</p>
+            </div>
+          </div>
+          <div class="dash-toolbar">
+            <div class="dash-search">
+              <span data-icon="search"></span>
+              <input class="dash-input" id="reqSearch" type="search" placeholder="Search name, phone, message…" autocomplete="off">
+            </div>
+            <select class="dash-select" id="reqFilter" aria-label="Filter requests by status">
+              <option value="all">All requests</option>
+              <option value="new">New</option>
+              <option value="done">Done</option>
+            </select>
+            <span class="toolbar-count" id="reqCount">0 shown</span>
+          </div>
+          <div class="dc-body flush">
+            <div class="req-grid" id="adminReqGrid"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Prices -->
+      <section class="dash-view" data-view="prices">
+        <div class="dash-card">
+          <div class="dc-head">
+            <div>
+              <h2>Shared price list</h2>
+              <p class="dc-sub">The invoice maker loads these prices automatically for every admin</p>
+            </div>
+          </div>
+          <div class="dash-toolbar">
+            <div class="dash-search">
+              <span data-icon="search"></span>
+              <input class="dash-input" id="priceSearch" type="search" placeholder="Search item or category…" autocomplete="off">
+            </div>
+            <select class="dash-select" id="priceGroup" aria-label="Filter by category">
+              <option value="All">All categories</option>
+              <option value="CCTV">CCTV</option>
+              <option value="Solar">Solar</option>
+              <option value="Wiring">Wiring</option>
+              <option value="Power &amp; Control">Power &amp; Control</option>
+              <option value="Labour">Labour</option>
+              <option value="Charges">Charges</option>
+            </select>
+            <span class="toolbar-count" id="priceCount">0 shown</span>
+          </div>
+          <div class="dc-body flush">
+            <div class="table-wrap">
+              <table class="dash-table" aria-label="Price list">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Item</th>
+                    <th class="right">Default</th>
+                    <th class="right">Your price</th>
+                    <th>State</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="priceBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card section-gap">
+          <div class="dc-head">
+            <div>
+              <h2>Custom price items</h2>
+              <p class="dc-sub">Add anything that is not in the standard catalogue</p>
+            </div>
+          </div>
+          <div class="dc-body">
+            <form id="customPriceForm" class="price-add" novalidate>
+              <div class="field">
+                <label for="cpName">Item name</label>
+                <input class="dash-input" id="cpName" type="text" placeholder="e.g. Extra drill work" required>
+              </div>
+              <div class="field" style="flex:0 1 170px">
+                <label for="cpPrice">Price (Rs.)</label>
+                <input class="dash-input" id="cpPrice" type="number" min="1" step="50" placeholder="2500" required>
+              </div>
+              <button class="btn btn-navy btn-sm" type="submit" id="cpSubmit">Add price</button>
+            </form>
+            <div class="table-wrap" style="margin-top:16px">
+              <table class="dash-table compact" aria-label="Custom prices">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th class="right">Price</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customPriceBody"></tbody>
+              </table>
+            </div>
+            <p class="dash-note">Prices are saved to <code>config/prices</code> and appear in the invoice maker for every signed-in admin.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Setup -->
+      <section class="dash-view" data-view="setup">
+        <div class="setup-grid">
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Admin account</h2>
+                <p class="dc-sub">Firebase identity and access</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <ul class="setup-list">
+                <li><span class="k">Signed in</span><span class="v" id="setupEmail">—</span></li>
+                <li><span class="k">Role</span><span class="v" id="setupRole">Administrator</span></li>
+                <li><span class="k">Your UID</span><span class="v mono" id="setupUid">—</span></li>
+                <li><span class="k">Admin email in config</span><span class="v" id="setupAdminEmail">Checking…</span></li>
+                <li><span class="k">Database rules</span><span class="v" id="setupRulesState">Checking…</span></li>
+              </ul>
+              <div class="setup-actions">
+                <button class="mini-act" type="button" id="btnCopyUid">Copy UID</button>
+                <button class="mini-act" type="button" id="btnCopyRules">Copy database rules</button>
+                <a class="mini-act" href="FIREBASE-SETUP.md" target="_blank" rel="noopener">Setup guide</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Cloud data</h2>
+                <p class="dc-sub">Backup and device recovery</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <ul class="setup-list">
+                <li><span class="k">Invoices</span><strong id="setupInvCount">0</strong></li>
+                <li><span class="k">Customers</span><strong id="setupCustCount">0</strong></li>
+                <li><span class="k">Administrators</span><strong id="setupAdminCount">0</strong></li>
+                <li><span class="k">Messages / requests</span><strong id="setupReqCount">0</strong></li>
+                <li><span class="k">Saved prices</span><strong id="setupPriceCount">0</strong></li>
+              </ul>
+              <div class="setup-actions">
+                <button class="btn btn-navy btn-sm" type="button" id="btnSyncLocal">Sync device invoices</button>
+                <button class="mini-act" type="button" id="btnExportJson">Export all data</button>
+                <button class="mini-act" type="button" id="btnExportCsv">Export invoice CSV</button>
+              </div>
+              <p class="dash-note">Export all data downloads invoices, customers, administrators, messages and prices from Firebase as one JSON backup. Sync uploads invoices saved on this device, updating existing cloud records without duplicates.</p>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Security</h2>
+                <p class="dc-sub">Session and connection protection</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <ul class="setup-list">
+                <li><span class="k">Connection</span><strong id="secHttps">Checking…</strong></li>
+                <li><span class="k">Clickjacking</span><strong id="secFrame">Checking…</strong></li>
+                <li><span class="k">Idle sign-out</span><strong id="secIdle">30 minutes</strong></li>
+                <li><span class="k">Login attempt guard</span><strong id="secGuard">Active</strong></li>
+                <li><span class="k">Private pages</span><strong id="secRobots">Checking…</strong></li>
+              </ul>
+              <p class="dash-note">CSP, HSTS and frame denial are served by Firebase Hosting from <code>firebase.json</code>. Run <code>firebase deploy</code> after changing them.</p>
+            </div>
+          </div>
+
+          <div class="dash-card span-all">
+            <div class="dc-head">
+              <div>
+                <h2>Firebase rules &amp; access check</h2>
+                <p class="dc-sub">Confirms the published rules allow the admin panel to read every collection</p>
+              </div>
+              <div class="dc-tools">
+                <button class="mini-act" type="button" id="btnRulesCheck">Run access check</button>
+                <button class="mini-act" type="button" id="btnCopyRules2">Copy latest rules</button>
+              </div>
+            </div>
+            <div class="dc-body flush">
+              <div class="table-wrap">
+                <table class="dash-table compact" aria-label="Rules access check">
+                  <thead>
+                    <tr>
+                      <th>Firebase path</th>
+                      <th>Controls</th>
+                      <th>Access</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rulesCheckBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <p class="dash-note" style="padding:0 20px 18px">Rules cannot be changed from the browser. Use Firebase Console → Realtime Database → Rules, or run <code>firebase deploy --only database</code> after updating <code>database.rules.json</code>.</p>
+          </div>
+
+          <div class="dash-card span-all">
+            <div class="dc-head">
+              <div>
+                <h2>Go-live checklist</h2>
+                <p class="dc-sub">One-time Firebase Console steps for the admin and customer logins</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <ol class="setup-guide">
+                <li><strong>Publish rules:</strong> Firebase Console → Realtime Database → Rules → paste <code>database.rules.json</code> → Publish.</li>
+                <li><strong>Enable login:</strong> Authentication → Sign-in method → enable <strong>Email/Password</strong>, <strong>Google</strong> and <strong>Phone</strong>.</li>
+                <li><strong>Set the first admin:</strong> Realtime Database → Data → create <code>config/adminEmail</code> with your admin email as a string (or <code>admins/UID</code> = <code>true</code>). After that, use <strong>Admins</strong> in this panel to add or remove other admins.</li>
+                <li><strong>Authorized domains:</strong> Authentication → Settings → Authorized domains → add the domain you host the website on.</li>
+                <li><strong>Test:</strong> sign out, sign in again at <code>login.html?next=admin.html</code>, create an invoice and watch it sync.</li>
+              </ol>
+              <div class="setup-actions">
+                <a class="btn btn-gold btn-sm" href="invoice.html">Open invoice maker</a>
+                <a class="btn btn-outline btn-sm" href="login.html?next=admin.html">Admin sign-in page</a>
+                <a class="btn btn-outline btn-sm" href="FIREBASE-SETUP.md" target="_blank" rel="noopener">Full setup guide</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Access gate -->
+<div class="dash-gate" id="dashGate">
+  <div class="gate-card">
+    <div class="gate-ico" id="gateIcon"></div>
+    <h1 id="gateTitle">Checking admin access…</h1>
+    <p id="gateText">Connecting to Alpha Electronic cloud.</p>
+    <div id="gateBody"></div>
+    <div class="gate-actions" id="gateActions"></div>
+  </div>
+</div>
+
+<!-- Assign customer modal -->
+<div class="modal" id="assignModal" role="dialog" aria-modal="true" aria-labelledby="assignTitle">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3 id="assignTitle">Assign invoice</h3>
+        <p class="modal-sub" id="assignSub">Link this invoice to a customer account.</p>
+      </div>
+      <button class="modal-close" type="button" data-close="assignModal" aria-label="Close">×</button>
+    </div>
+    <div class="field">
+      <label for="assignCustomer">Customer account</label>
+      <select id="assignCustomer"></select>
+    </div>
+    <p class="dash-note">Only the assigned customer can open this invoice in their portal. Choose “Not assigned” to remove their access.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" type="button" data-close="assignModal">Cancel</button>
+      <button class="btn btn-navy btn-sm" type="button" id="assignSave">Save assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit customer modal -->
+<div class="modal" id="customerModal" role="dialog" aria-modal="true" aria-labelledby="customerTitle">
+  <div class="modal-card narrow">
+    <div class="modal-head">
+      <div>
+        <h3 id="customerTitle">Edit customer</h3>
+        <p class="modal-sub" id="customerSub">Update the details saved in Firebase.</p>
+      </div>
+      <button class="modal-close" type="button" data-close="customerModal" aria-label="Close">×</button>
+    </div>
+    <div class="field">
+      <label for="custEditName">Name</label>
+      <input class="dash-input" id="custEditName" type="text" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="custEditPhone">Phone / WhatsApp</label>
+      <input class="dash-input" id="custEditPhone" type="tel" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="custEditEmail">Login email</label>
+      <input class="dash-input" id="custEditEmail" type="email" disabled>
+    </div>
+    <p class="dash-note">Saved to <code>users/UID</code>. The login email cannot be changed here.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" type="button" data-close="customerModal">Cancel</button>
+      <button class="btn btn-navy btn-sm" type="button" id="custEditSave">Save customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message note modal -->
+<div class="modal" id="noteModal" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+  <div class="modal-card narrow">
+    <div class="modal-head">
+      <div>
+        <h3 id="noteTitle">Message note</h3>
+        <p class="modal-sub" id="noteSub">Internal note saved in Firebase.</p>
+      </div>
+      <button class="modal-close" type="button" data-close="noteModal" aria-label="Close">×</button>
+    </div>
+    <div class="field">
+      <label for="noteText">Note</label>
+      <textarea class="dash-input" id="noteText" rows="4" maxlength="2000" placeholder="Called customer, quote sent, follow up on Monday…"></textarea>
+    </div>
+    <p class="dash-note">Only administrators can read notes. Saved to <code>serviceRequests/ID/adminNote</code>.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" type="button" data-close="noteModal">Cancel</button>
+      <button class="btn btn-navy btn-sm" type="button" id="noteSave">Save note</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal-card narrow">
+    <div class="modal-head">
+      <div>
+        <h3 id="confirmTitle">Delete?</h3>
+      </div>
+      <button class="modal-close" type="button" data-close="confirmModal" aria-label="Close">×</button>
+    </div>
+    <p class="modal-sub" id="confirmText"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" type="button" data-close="confirmModal">Cancel</button>
+      <button class="btn btn-danger btn-sm" type="button" id="confirmGo">Delete</button>
+    </div>
+  </div>
+</div>
+
+<noscript>
+  <div style="position:fixed;inset:0;background:#fff;display:grid;place-items:center;padding:30px;text-align:center;z-index:200">
+    JavaScript is required to use the Alpha Electronic admin panel.
+  </div>
+</noscript>
+
+<script src="vendor/firebase-app-compat.js"></script>
+<script src="vendor/firebase-auth-compat.js"></script>
+<script src="vendor/firebase-database-compat.js"></script>
+<script src="firebase-config.js?v=bed0b"></script>
+<script src="cloud.js"></script>
+<script src="ui.js"></script>
+<script src="security.js"></script>
+<script src="catalog.js"></script>
+<script src="dashboard.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

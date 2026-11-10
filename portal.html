@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer portal — Alpha Electronic</title>
+<meta name="description" content="View your Alpha Electronic invoices, balances and service history.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#08111f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308111f'/%3E%3Ctext x='30' y='46' font-family='Georgia' font-size='38' font-style='italic' text-anchor='middle' fill='%23f3b23f'%3EA%3C/text%3E%3Ccircle cx='49' cy='17' r='5' fill='%23d62828'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dash-body dash-locked">
+
+<div class="dash-shell">
+  <aside class="dash-side" id="dashSide" aria-label="Customer portal navigation">
+    <a class="dash-brand" href="index.html" aria-label="Alpha Electronic home">
+      <span class="brand-mark">A</span>
+      <span class="brand-text">
+        <strong>Alpha Electronic</strong>
+        <span>Customer portal</span>
+      </span>
+    </a>
+
+    <nav class="dash-nav">
+      <span class="dash-nav-label">Portal</span>
+      <button class="dash-link active" type="button" data-tab="overview" data-title="Overview" data-sub="Your invoices, balance and quick actions">
+        <span class="li-ico" data-icon="grid"></span> Overview
+      </button>
+      <button class="dash-link" type="button" data-tab="invoices" data-title="My invoices" data-sub="View, print or share your Alpha Electronic documents">
+        <span class="li-ico" data-icon="file"></span> My invoices
+      </button>
+      <button class="dash-link" type="button" data-tab="request" data-title="Request service" data-sub="Site visits, quotations and technical support">
+        <span class="li-ico" data-icon="wrench"></span> Request service
+      </button>
+      <button class="dash-link" type="button" data-tab="profile" data-title="My profile" data-sub="Keep your contact details up to date">
+        <span class="li-ico" data-icon="user"></span> My profile
+      </button>
+
+      <span class="dash-nav-label">Shortcuts</span>
+      <a class="dash-link admin-only" href="admin.html" style="display:none">
+        <span class="li-ico" data-icon="gear"></span> Admin panel
+      </a>
+      <a class="dash-link admin-only" href="invoice.html" style="display:none">
+        <span class="li-ico" data-icon="file"></span> Invoice maker
+      </a>
+      <a class="dash-link" href="index.html">
+        <span class="li-ico" data-icon="home"></span> Main website
+      </a>
+    </nav>
+
+    <div class="dash-side-foot">
+      <div class="dash-user">
+        <span class="du-avatar" id="userAvatar">A</span>
+        <span class="du-meta">
+          <strong id="userName">Account</strong>
+          <span id="userMail">—</span>
+        </span>
+      </div>
+      <button class="dash-signout" id="btnSignOut" type="button">Sign out</button>
+      <p class="dash-side-note">Reg. No 11/2622<br><a href="tel:+94773283588">077 328 3588</a></p>
+    </div>
+  </aside>
+
+  <div class="dash-scrim" id="dashScrim"></div>
+
+  <div class="dash-main">
+    <header class="dash-top">
+      <button class="dash-menu" id="dashMenu" type="button" aria-label="Open menu">
+        <span data-icon="menu"></span>
+      </button>
+      <div class="dash-title">
+        <h1 id="pageTitle">Overview</h1>
+        <p id="pageSub">Your invoices, balance and quick actions</p>
+      </div>
+      <div class="dash-top-actions">
+        <a class="btn btn-outline btn-sm hide-sm" href="index.html">Website</a>
+        <a class="btn btn-gold btn-sm" href="index.html#contact">Get a quote</a>
+      </div>
+    </header>
+
+    <main class="dash-content">
+      <div class="dash-alert" id="dashAlert" role="status"></div>
+
+      <!-- Overview -->
+      <section class="dash-view active" data-view="overview">
+        <div class="stat-grid" id="portalStats"></div>
+
+        <div class="dash-grid two section-gap">
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Recent invoices</h2>
+                <p class="dc-sub">Your latest Alpha Electronic documents</p>
+              </div>
+              <button class="mini-act" type="button" data-goto="invoices">View all</button>
+            </div>
+            <div class="dc-body flush">
+              <div class="table-wrap">
+                <table class="dash-table compact" aria-label="Recent invoices">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Invoice</th>
+                      <th class="right">Total</th>
+                      <th class="right">Balance</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="portalRecentBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Need something?</h2>
+                <p class="dc-sub">We are one message away</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <div class="quick-list">
+                <button class="quick-item" type="button" data-goto="request">
+                  <span class="quick-ico" data-icon="wrench"></span>
+                  <span><strong>Request a site visit</strong><span>Solar, CCTV or wiring estimate</span></span>
+                  <span class="qa-arrow">→</span>
+                </button>
+                <a class="quick-item" href="https://wa.me/94773283588" target="_blank" rel="noopener">
+                  <span class="quick-ico" data-icon="phone"></span>
+                  <span><strong>Chat on WhatsApp</strong><span>077 328 3588 — fastest reply</span></span>
+                  <span class="qa-arrow">→</span>
+                </a>
+                <a class="quick-item" href="tel:+94773283588">
+                  <span class="quick-ico" data-icon="phone"></span>
+                  <span><strong>Call the office</strong><span>8.00 am – 6.00 pm</span></span>
+                  <span class="qa-arrow">→</span>
+                </a>
+                <a class="quick-item" href="index.html#solar">
+                  <span class="quick-ico" data-icon="tag"></span>
+                  <span><strong>Solar packages</strong><span>5kV to 40kV systems</span></span>
+                  <span class="qa-arrow">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Invoices -->
+      <section class="dash-view" data-view="invoices">
+        <div class="dash-card">
+          <div class="dc-head">
+            <div>
+              <h2>Your invoices &amp; quotations <span class="badge muted" id="portalInvCount">0</span></h2>
+              <p class="dc-sub">Every document Alpha Electronic has shared with your account</p>
+            </div>
+            <button class="btn btn-outline btn-sm" type="button" id="btnRefreshInv">Refresh</button>
+          </div>
+          <div class="dc-body flush">
+            <div class="table-wrap">
+              <table class="dash-table" aria-label="My invoices">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Invoice</th>
+                    <th class="right">Total</th>
+                    <th class="right">Balance</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="portalInvBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p class="dash-note">Open a document for a read-only view, then use <strong>Print / Save PDF</strong>. <strong>Copy link</strong> creates a view link you can share.</p>
+      </section>
+
+      <!-- Request service -->
+      <section class="dash-view" data-view="request">
+        <div class="dash-grid two">
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Request a service</h2>
+                <p class="dc-sub">Tell us what you need — we will contact you on WhatsApp</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <form id="requestForm" class="dash-form" novalidate>
+                <div class="dash-form-grid">
+                  <div class="field">
+                    <label for="rqName">Your name</label>
+                    <input id="rqName" type="text" autocomplete="name" required>
+                  </div>
+                  <div class="field">
+                    <label for="rqPhone">Phone / WhatsApp</label>
+                    <input id="rqPhone" type="tel" autocomplete="tel" required>
+                  </div>
+                  <div class="field full">
+                    <label for="rqEmail">Email (optional)</label>
+                    <input id="rqEmail" type="email" autocomplete="email">
+                  </div>
+                  <div class="field full">
+                    <label for="rqType">What do you need?</label>
+                    <select id="rqType">
+                      <option value="site visit">Site visit &amp; estimate</option>
+                      <option value="quotation">Quotation</option>
+                      <option value="service">Service / repair</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="rqMessage">Message</label>
+                    <textarea id="rqMessage" required placeholder="e.g. Need a 5kV solar quotation for a house in Panagamuwa"></textarea>
+                  </div>
+                </div>
+                <button class="btn btn-gold" type="submit" id="rqSubmit">Send request</button>
+                <div class="form-status" id="rqStatus" role="status"></div>
+              </form>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Talk to us directly</h2>
+                <p class="dc-sub">Working hours: 8.00 am – 6.00 pm</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <div class="quick-list">
+                <a class="quick-item" href="https://wa.me/94773283588" target="_blank" rel="noopener">
+                  <span class="quick-ico" data-icon="phone"></span>
+                  <span><strong>WhatsApp</strong><span>077 328 3588</span></span>
+                  <span class="qa-arrow">→</span>
+                </a>
+                <a class="quick-item" href="tel:+94773283588">
+                  <span class="quick-ico" data-icon="phone"></span>
+                  <span><strong>Call</strong><span>077 328 3588</span></span>
+                  <span class="qa-arrow">→</span>
+                </a>
+                <a class="quick-item" href="index.html#contact">
+                  <span class="quick-ico" data-icon="home"></span>
+                  <span><strong>Visit the office</strong><span>Ranthati kanda, Panagamuwa, Kurunegala</span></span>
+                  <span class="qa-arrow">→</span>
+                </a>
+              </div>
+              <p class="dash-note">Alpha Electronic · Solar, CCTV, power control, motor control, house &amp; industrial wiring · Reg. No 11/2622 · <a href="privacy.html" style="color:#2458c5;font-weight:800">Privacy policy</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile -->
+      <section class="dash-view" data-view="profile">
+        <div class="dash-grid two">
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Contact details</h2>
+                <p class="dc-sub">Keep these up to date so we can reach you</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <form id="profileForm" class="dash-form" novalidate>
+                <div class="field">
+                  <label for="pfName">Full name</label>
+                  <input id="pfName" type="text" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label for="pfPhone">Phone / WhatsApp</label>
+                  <input id="pfPhone" type="tel" autocomplete="tel">
+                </div>
+                <div class="field">
+                  <label for="pfEmail">Email</label>
+                  <input id="pfEmail" type="email" disabled>
+                  <p class="hint">Email is managed by your sign-in account.</p>
+                </div>
+                <button class="btn btn-navy" type="submit" id="pfSubmit">Save changes</button>
+                <div class="form-status" id="pfStatus" role="status"></div>
+              </form>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <div class="dc-head">
+              <div>
+                <h2>Account</h2>
+                <p class="dc-sub">Your secure Alpha Electronic login</p>
+              </div>
+            </div>
+            <div class="dc-body">
+              <ul class="acct-list">
+                <li><span class="k">Signed in</span><span class="v" id="acctEmail">—</span></li>
+                <li><span class="k">Role</span><span class="v" id="acctRole">Customer</span></li>
+                <li><span class="k">Account ID</span><span class="v mono" id="acctUid">—</span></li>
+                <li><span class="k">Cloud connection</span><span class="v" id="acctCloud">Checking…</span></li>
+              </ul>
+              <div class="setup-actions">
+                <button class="mini-act" type="button" id="btnCopyUid">Copy account ID</button>
+                <a class="mini-act" href="login.html">Switch account</a>
+                <a class="mini-act" href="index.html#contact">Contact office</a>
+              </div>
+              <p class="dash-note">Invoices are linked to your account by Alpha Electronic. If a document is missing, send us a message and we will attach it.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Access gate -->
+<div class="dash-gate" id="dashGate">
+  <div class="gate-card narrow">
+    <div class="gate-ico" id="gateIcon"></div>
+    <h1 id="gateTitle">Checking your account…</h1>
+    <p id="gateText">Connecting to Alpha Electronic cloud.</p>
+    <div id="gateBody"></div>
+    <div class="gate-actions" id="gateActions"></div>
+  </div>
+</div>
+
+<noscript>
+  <div style="position:fixed;inset:0;background:#fff;display:grid;place-items:center;padding:30px;text-align:center;z-index:200">
+    JavaScript is required to use the Alpha Electronic customer portal.
+  </div>
+</noscript>
+
+<script src="vendor/firebase-app-compat.js"></script>
+<script src="vendor/firebase-auth-compat.js"></script>
+<script src="vendor/firebase-database-compat.js"></script>
+<script src="firebase-config.js?v=bed0b"></script>
+<script src="cloud.js"></script>
+<script src="ui.js"></script>
+<script src="security.js"></script>
+<script src="dashboard.js"></script>
+<script src="portal.js"></script>
+</body>
+</html>

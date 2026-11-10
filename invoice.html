@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Electronic — Invoice Maker</title>
+<meta name="description" content="Bill / invoice maker for Alpha Electronic — CCTV, solar and wiring.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2308111f'/%3E%3Ctext x='32' y='45' font-family='Georgia' font-size='36' font-style='italic' text-anchor='middle' fill='%23f3b23f'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="toolbar no-print">
+  <div class="tb-inner">
+    <a class="tb-brand" href="index.html" title="Back to website">
+      <span class="tb-mark">A</span>
+      <div>
+        <strong>Alpha Electronic</strong>
+        <span class="tb-sub">Invoice Maker</span>
+      </div>
+    </a>
+    <div class="tb-actions">
+      <button id="btnNew" class="btn ghost" type="button">New</button>
+      <button id="btnSave" class="btn ghost" type="button">Save</button>
+      <button id="btnHistory" class="btn ghost" type="button">History <span id="histCount" class="pill">0</span></button>
+      <button id="btnShare" class="btn ghost" type="button">Share</button>
+      <button id="btnPrint" class="btn ghost" type="button">Print</button>
+      <button id="btnPdf" class="btn accent" type="button">Download PDF</button>
+    </div>
+  </div>
+</header>
+
+<div class="cloud-strip no-print" id="cloudStrip">
+  <div class="cs-inner">
+    <span class="cs-dot" id="cloudDot" aria-hidden="true"></span>
+    <span class="cs-text" id="cloudText">Local mode — sign in to sync invoices</span>
+    <span class="cs-actions">
+      <a id="cloudSignIn" class="mini-btn" href="login.html?next=invoice.html">Sign in</a>
+      <button id="btnCloudSync" class="mini-btn primary" type="button" hidden>Sync now</button>
+      <a id="cloudAdmin" class="mini-btn" href="admin.html" hidden>Admin panel</a>
+    </span>
+  </div>
+</div>
+
+<div id="viewBanner" class="view-banner no-print" hidden>
+  <span>Shared invoice — view only</span>
+  <div class="vb-actions">
+    <button id="btnViewPdf" class="mini-btn primary" type="button">Print / Save PDF</button>
+    <button id="btnViewEdit" class="mini-btn" type="button">Edit this invoice</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <aside class="builder no-print">
+    <h2>Item Catalog</h2>
+    <p class="hint">Click an item to add it to the invoice. Prices are editable after adding.</p>
+
+    <details class="settings" id="settingsPanel">
+      <summary>Signature, seal &amp; charges</summary>
+      <div class="settings-body">
+        <label class="set-label" for="sigName">Signature name (script style)</label>
+        <input id="sigName" class="search" type="text" autocomplete="off" placeholder="e.g. S. Bandara">
+
+        <label class="set-label" for="sigUpload">Or upload signature image</label>
+        <div class="row-inline">
+          <input id="sigUpload" class="file-input" type="file" accept="image/png,image/jpeg">
+          <button id="btnSigClear" class="mini-btn" type="button">Remove</button>
+        </div>
+
+        <label class="check"><input id="sealToggle" type="checkbox" checked> Show company seal on invoice</label>
+
+        <div class="set-divider"></div>
+
+        <label class="set-label" for="installAmount">Installation / insulation charge (Rs.)</label>
+        <div class="row-inline">
+          <input id="installAmount" class="search" type="number" min="0" step="100" value="2500">
+          <button id="btnAddInstall" class="mini-btn primary" type="button">Add to bill</button>
+        </div>
+        <label class="check"><input id="autoInstall" type="checkbox" checked> Auto add to every new invoice</label>
+
+        <div class="set-divider"></div>
+        <button id="btnClearItems" class="mini-btn" type="button">Clear saved “My Items”</button>
+        <p class="builder-foot">Custom items you type are saved to “My Items”. Prices you change on a bill are remembered for next time. Every bill is auto-saved as you type.</p>
+
+        <div class="set-divider"></div>
+        <label class="set-label">Backup / recover</label>
+        <div class="row-inline">
+          <button id="btnBackup" class="mini-btn" type="button">Download backup</button>
+          <button id="btnRestore" class="mini-btn" type="button">Restore backup</button>
+        </div>
+        <input id="backupFile" class="file-input" type="file" accept=".json,application/json" hidden>
+        <p class="builder-foot">Backup saves every bill, item and setting into one file. Restore it here or on another device.</p>
+      </div>
+    </details>
+
+    <button id="btnQuickInstall" class="quick-install" type="button">
+      <span class="qi-label">＋ Add installation / insulation charge</span>
+      <span id="quickInstallAmt" class="qi-amt">Rs. 2,500</span>
+    </button>
+
+    <input id="search" class="search" type="search" placeholder="Search items — camera, panel, wiring…" autocomplete="off">
+    <div id="chips" class="chips"></div>
+    <div id="catalog" class="catalog"></div>
+    <p class="builder-foot">Prices are guide rates (LKR). Change them on the invoice as needed. <a href="privacy.html" style="color:#2458c5;font-weight:800">Privacy policy</a></p>
+  </aside>
+
+  <main class="stage">
+    <section class="paper" id="paper">
+
+      <div class="brand-bar"></div>
+
+      <!-- Letterhead -->
+      <div class="letterhead">
+        <h1 class="logo"><span class="logo-a">Alpha</span> <span class="logo-e">Electronic</span></h1>
+        <p class="tagline">Solar system installation, CCTV system, Power control, motor control, house wiring, Industrial wiring, gate &amp; hi security system.</p>
+        <div class="lh-rule"></div>
+        <div class="lh-foot">
+          <span>Ranthati kanda, Panagamuwa, Kurunegala</span>
+          <span>Reg: No 11/2622</span>
+          <span>Mobile: 0773283588</span>
+        </div>
+      </div>
+
+      <!-- Document head -->
+      <div class="doc-head">
+        <div class="doc-title-wrap">
+          <div class="doc-title">INVOICE</div>
+          <div class="doc-flags">
+            <span id="statusPill" class="status-pill draft">Draft</span>
+            <span id="saveState" class="save-state no-print">Auto-save on</span>
+          </div>
+        </div>
+        <div class="inv-meta">
+          <label class="meta-row">
+            <span>Invoice No</span>
+            <input id="invNo" class="meta-input" type="text" autocomplete="off">
+          </label>
+          <label class="meta-row">
+            <span>Date</span>
+            <input id="invDate" class="meta-input" type="date">
+          </label>
+          <label class="meta-row">
+            <span>Type</span>
+            <select id="invType" class="meta-input">
+              <option>Cash Invoice</option>
+              <option>Credit Invoice</option>
+              <option>Quotation</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <!-- Bill to -->
+      <div class="bill-to">
+        <div class="bill-to-label">Bill To</div>
+        <div class="bill-to-row">
+          <select id="custTitle" class="bill-input title-select">
+            <option>Mr.</option>
+            <option>Mrs.</option>
+            <option>Ms.</option>
+            <option>Miss</option>
+            <option>Company</option>
+          </select>
+          <input id="custName" class="bill-input" type="text" placeholder="Customer name" autocomplete="off">
+        </div>
+        <div class="bill-to-row">
+          <input id="custAddress" class="bill-input" type="text" placeholder="Address" autocomplete="off">
+        </div>
+        <div class="bill-to-row">
+          <input id="custPhone" class="bill-input" type="text" placeholder="Phone number" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="table-wrap">
+        <table class="items" id="itemsTable">
+          <colgroup>
+            <col class="c-idx">
+            <col class="c-qty">
+            <col class="c-item">
+            <col class="c-desc">
+            <col class="c-price">
+            <col class="c-amt">
+            <col class="c-del">
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="ta-c">#</th>
+              <th class="ta-c">Qty</th>
+              <th>Item</th>
+              <th>Description</th>
+              <th class="ta-r">Price</th>
+              <th class="ta-r">Amount</th>
+              <th class="no-print"></th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
+
+      <button id="btnAddRow" class="add-row no-print" type="button">+ Add item row</button>
+
+      <!-- Summary -->
+      <div class="summary">
+        <div class="notes-col">
+          <label class="notes-label" for="notes">Notes / Terms</label>
+          <textarea id="notes" class="notes" rows="3"></textarea>
+          <div class="in-words">
+            <span>Amount in words</span>
+            <div id="amountWords">Rupees Zero Only</div>
+          </div>
+        </div>
+        <div class="totals">
+          <div class="trow"><span>Subtotal</span><span id="tSub">Rs. 0.00</span></div>
+          <div class="trow">
+            <span>Discount</span>
+            <span class="money-in"><span>Rs.</span><input id="discount" type="number" min="0" step="0.01" value="0"></span>
+          </div>
+          <div class="trow net"><span>Net Total</span><span id="tNet">Rs. 0.00</span></div>
+          <div class="trow">
+            <span>Advance Paid</span>
+            <span class="money-in"><span>Rs.</span><input id="advance" type="number" min="0" step="0.01" value="0"></span>
+          </div>
+          <div class="trow balance"><span>Balance Due</span><span id="tBal">Rs. 0.00</span></div>
+        </div>
+      </div>
+
+      <!-- Signature -->
+      <div class="sign-wrap">
+        <div class="thanks">Thank you for your business!</div>
+        <div class="sign-block">
+          <img id="sealImg" class="seal-img" alt="Company seal">
+          <div class="sign-box">
+            <img id="signImg" class="signature" alt="Signature">
+            <div class="sign-line"></div>
+            <div class="sign-label">Authorized Signature</div>
+            <div class="sign-name" id="signNameLabel">Alpha Electronic</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="paper-foot">
+        Alpha Electronic · Ranthati kanda, Panagamuwa, Kurunegala · Mobile 0773283588
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<!-- Share modal -->
+<div class="modal no-print" id="shareModal" aria-hidden="true">
+  <div class="modal-card share-card" role="dialog" aria-label="Share invoice">
+    <div class="modal-head">
+      <h3>Share Invoice</h3>
+      <button class="icon-btn" id="btnCloseShare" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="share-body">
+      <label class="set-label" for="shareLink">Online invoice link (read-only)</label>
+      <input id="shareLink" class="search" type="text" readonly>
+      <div class="share-actions">
+        <button id="btnCopyLink" class="mini-btn primary" type="button">Copy link</button>
+        <button id="btnShareNative" class="mini-btn" type="button" hidden>Share…</button>
+        <button id="btnCopyMsg" class="mini-btn" type="button">Copy WhatsApp message</button>
+      </div>
+      <p class="share-note">The link opens as a read-only bill with Print / Save PDF. If you are signed in as admin, this invoice is also saved in the cloud and can be assigned to a customer account from the Admin panel. You can always send the PDF file directly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- History modal -->
+<div class="modal no-print" id="historyModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-label="Saved invoices">
+    <div class="modal-head">
+      <h3>Saved Invoices</h3>
+      <button class="icon-btn" id="btnCloseHist" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast no-print" role="status" aria-live="polite"></div>
+
+<script src="vendor/firebase-app-compat.js"></script>
+<script src="vendor/firebase-auth-compat.js"></script>
+<script src="vendor/firebase-database-compat.js"></script>
+<script src="firebase-config.js?v=bed0b"></script>
+<script src="cloud.js"></script>
+<script src="ui.js"></script>
+<script src="security.js"></script>
+<script src="catalog.js"></script>
+<script src="vendor/html-to-image.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

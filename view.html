@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online invoice preview — Alpha Electronic</title>
+<meta name="description" content="View an Alpha Electronic invoice or quotation online. Read-only copy with print and PDF options.">
+<meta name="theme-color" content="#08111f">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308111f'/%3E%3Ctext x='30' y='46' font-family='Georgia' font-size='38' font-style='italic' text-anchor='middle' fill='%23f3b23f'%3EA%3C/text%3E%3Ccircle cx='49' cy='17' r='5' fill='%23d62828'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="view.css">
+<link rel="stylesheet" href="chat.css">
+</head>
+<body class="view-body">
+
+<header class="view-top no-print">
+  <div class="vt-inner">
+    <a class="vt-brand" href="index.html" aria-label="Alpha Electronic home">
+      <span class="vt-mark">A</span>
+      <span class="vt-brand-text">
+        <strong>Alpha Electronic</strong>
+        <small>Online invoice preview</small>
+      </span>
+    </a>
+    <div class="vt-actions">
+      <a class="vt-link" id="vAccount" href="login.html">Sign in</a>
+      <a class="vt-link" href="index.html">Website</a>
+      <button class="vt-btn" id="vCopy" type="button" disabled>Copy link</button>
+      <button class="vt-btn" id="vWa" type="button" disabled>WhatsApp</button>
+      <button class="vt-btn primary" id="vPrint" type="button" disabled>Print / Save PDF</button>
+    </div>
+  </div>
+</header>
+
+<main class="view-main">
+
+  <div class="view-state" id="viewState" role="status">
+    <div class="vs-card">
+      <div class="vs-ico" id="vStateIcon" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>
+      </div>
+      <h1 id="vStateTitle">Opening invoice…</h1>
+      <p id="vStateText">Please wait while we load the document.</p>
+      <div class="vs-actions" id="vStateActions"></div>
+    </div>
+    <p class="vs-foot">Alpha Electronic · Reg. No 11/2622 · 077 328 3588</p>
+  </div>
+
+  <div class="layout view-layout" id="viewLayout" hidden>
+    <div class="stage">
+      <section class="paper" id="viewPaper" aria-label="Invoice document">
+
+        <div class="brand-bar"></div>
+
+        <div class="letterhead">
+          <h1 class="logo"><span class="logo-a">Alpha</span> <span class="logo-e">Electronic</span></h1>
+          <p class="tagline">Solar system installation, CCTV system, Power control, motor control, house wiring, Industrial wiring, gate &amp; hi security system.</p>
+          <div class="lh-rule"></div>
+          <div class="lh-foot">
+            <span>Ranthati kanda, Panagamuwa, Kurunegala</span>
+            <span>Reg: No 11/2622</span>
+            <span>Mobile: 0773283588</span>
+          </div>
+        </div>
+
+        <div class="doc-head">
+          <div class="doc-title-wrap">
+            <div class="doc-title" id="vDocTitle">INVOICE</div>
+            <div class="doc-flags">
+              <span id="vStatus" class="status-pill due">Balance Due</span>
+              <span class="save-state">Online copy</span>
+            </div>
+          </div>
+          <div class="inv-meta">
+            <div class="meta-row"><span>Invoice No</span><span class="meta-input meta-static" id="vNo">—</span></div>
+            <div class="meta-row"><span>Date</span><span class="meta-input meta-static" id="vDate">—</span></div>
+            <div class="meta-row"><span>Type</span><span class="meta-input meta-static" id="vType">—</span></div>
+          </div>
+        </div>
+
+        <div class="bill-to">
+          <div class="bill-to-label">Bill To</div>
+          <div class="bill-to-row">
+            <span class="bill-input title-select" id="vCustTitle">Mr.</span>
+            <span class="bill-input" id="vCustName">Customer</span>
+          </div>
+          <div class="bill-to-row"><span class="bill-input" id="vCustAddress"></span></div>
+          <div class="bill-to-row"><span class="bill-input" id="vCustPhone"></span></div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="items">
+            <colgroup>
+              <col class="c-idx">
+              <col class="c-qty">
+              <col class="c-item">
+              <col class="c-desc">
+              <col class="c-price">
+              <col class="c-amt">
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="ta-c">#</th>
+                <th class="ta-c">Qty</th>
+                <th>Item</th>
+                <th>Description</th>
+                <th class="ta-r">Price</th>
+                <th class="ta-r">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="vItems"></tbody>
+          </table>
+        </div>
+
+        <div class="summary">
+          <div class="notes-col">
+            <div class="notes-label">Notes / Terms</div>
+            <div class="notes view-notes" id="vNotes"></div>
+            <div class="in-words">
+              <span>Amount in words</span>
+              <div id="vWords">Rupees Zero Only</div>
+            </div>
+          </div>
+          <div class="totals">
+            <div class="trow"><span>Subtotal</span><span id="vSub">Rs. 0.00</span></div>
+            <div class="trow"><span>Discount</span><span id="vDiscount">Rs. 0.00</span></div>
+            <div class="trow net"><span>Net Total</span><span id="vNet">Rs. 0.00</span></div>
+            <div class="trow"><span>Advance Paid</span><span id="vAdvance">Rs. 0.00</span></div>
+            <div class="trow balance"><span>Balance Due</span><span id="vBal">Rs. 0.00</span></div>
+          </div>
+        </div>
+
+        <div class="sign-wrap">
+          <div class="thanks">Thank you for your business!</div>
+          <div class="sign-block">
+            <img id="vSeal" class="seal-img" alt="Company seal">
+            <div class="sign-box">
+              <img id="vSign" class="signature" alt="Signature">
+              <div class="sign-line"></div>
+              <div class="sign-label">Authorized Signature</div>
+              <div class="sign-name" id="vSignName">Alpha Electronic</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="paper-foot">
+          Alpha Electronic · Ranthati kanda, Panagamuwa, Kurunegala · Mobile 0773283588
+        </div>
+
+      </section>
+    </div>
+  </div>
+
+</main>
+
+<div class="view-foot no-print">
+  <span>Read-only online copy. Prices in LKR. Private link — share only with the customer.</span>
+  <span><a href="index.html#contact">Contact Alpha Electronic</a> · <a href="privacy.html">Privacy policy</a> · 077 328 3588</span>
+</div>
+
+<div id="toast" class="toast no-print" role="status" aria-live="polite"></div>
+
+<script src="vendor/firebase-app-compat.js"></script>
+<script src="vendor/firebase-auth-compat.js"></script>
+<script src="vendor/firebase-database-compat.js"></script>
+<script src="firebase-config.js?v=bed0b"></script>
+<script src="cloud.js"></script>
+<script src="ui.js"></script>
+<script src="security.js"></script>
+<script src="view.js"></script>
+<script src="chat.js"></script>
+</body>
+</html>
